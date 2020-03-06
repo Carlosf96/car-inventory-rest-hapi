@@ -2,8 +2,11 @@ import DataStore from 'nedb';
 import { ServerRoute } from '@hapi/hapi';
 
 import { Controller } from '../controllers/typings';
+import DbService from '../services/db.service';
 
-const db = new DataStore();
+const dbInstance = new DataStore();
+
+const db = DbService(dbInstance);
 
 const createCrudConfig = (controller: Controller, path?: string): ServerRoute[] => {
   return [
@@ -15,23 +18,19 @@ const createCrudConfig = (controller: Controller, path?: string): ServerRoute[] 
     {
       method: 'PUT',
       path: path || '/',
-      handler: controller.update,
+      handler: controller.put,
     },
     {
       method: 'POST',
       path: path || '/',
-      handler: controller.create,
+      handler: controller.post,
     },
     {
       method: 'DELETE',
       path: path || '/',
-      handler: controller.destroy,
-    },
-    {
-      method: 'PATCH',
-      path: path || '/',
-      handler: controller.patch,
-    }]
+      handler: controller.delete,
+    }
+  ]
 }
 
 export { db, createCrudConfig };

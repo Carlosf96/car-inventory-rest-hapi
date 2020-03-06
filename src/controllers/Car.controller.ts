@@ -1,9 +1,10 @@
-import { Request, ResponseToolkit, RequestQuery } from '@hapi/hapi';
+import { Request, ResponseToolkit, RequestQuery, } from '@hapi/hapi';
+
 import { Car } from '../db/entities/Car';
 
 export default (db?: any) => {
   return {
-    create: (req: Request, res: ResponseToolkit) => {
+    post: async (req: Request, res: ResponseToolkit) => {
       let { payload } = req;
       let { make, vin, model, year }: any = payload;
       if (!make || !vin || !model || !year) {
@@ -13,14 +14,8 @@ export default (db?: any) => {
           })
           .code(403);
       }
-      db.insert(payload, (err: any, car: Car) => {
-        if (err) {
-          throw new Error('Could not create new Car');
-        } else {
-          console.log(car);
-        }
-      });
-      return payload;
+      const car = await db.save(payload);
+      return car;
     },
     get: async (req: Request, res: ResponseToolkit) => {
       const { make, vin, model, year } = req.query;
@@ -55,17 +50,13 @@ export default (db?: any) => {
         }
       }
     },
-    update: (req: Request, res: ResponseToolkit) => {
+    put: (req: Request, res: ResponseToolkit) => {
       db.update()
       return 'put request!';
     },
-    destroy: (req: Request, res: ResponseToolkit) => {
-      db.delete()
+    delete: (req: Request, res: ResponseToolkit) => {
+      db.destroy()
       return 'delete request!';
     },
-    patch: (req: Request, res: ResponseToolkit) => {
-      db.patch()
-      return 'patch!';
-    }
   };
 };
