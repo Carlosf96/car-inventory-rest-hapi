@@ -5,8 +5,8 @@ import { Car } from '../db/entities/Car';
 export default (db?: any) => {
   return {
     post: async (req: Request, res: ResponseToolkit) => {
-      let { payload } = req;
-      let { make, vin, model, year }: any = payload;
+      const { payload } = req;
+      const { make, vin, model, year }: any = payload;
       if (!make || !vin || !model || !year) {
         return res
           .response({
@@ -28,11 +28,11 @@ export default (db?: any) => {
       try {
         if (!year || !model || !make || !vin) {
           console.log('no query params');
-          let cars: Car[] = await db.find({});
-          return cars.length ? cars : 'No cars found';
+          const cars: Car[] = await db.find({});
+          return cars.length ? cars : { message: 'No cars found' };
         } else {
           console.log(req.query)
-          let cars: Car | Car[] = await db.find({ yr, ...req });
+          const cars: Car | Car[] = await db.find({ yr, ...req });
           return cars;
         }
       } catch (e) {
@@ -44,21 +44,29 @@ export default (db?: any) => {
       const { _id }: any = req.payload;
       if (!req.query._id) {
         console.log(req.query._id);
-        return 'Query parameter _id is required in order to update a car';
+        return { message: 'Query parameter _id is required in order to update a car' };
       }
       if (_id !== undefined) {
-        return 'You cannot change a Unique Identifier';
+        return { message: 'You cannot change a Unique Identifier' };
       }
-      let update = await db.update(req);
+      const update = await db.update(req);
       if (!update) {
-        return 'Unable to update car with ID: ' + req.query._id;
+        return { message: 'Unable to update car with ID: ' + req.query._id };
       } else {
         return await db.find(req.query._id);
       }
     },
-    delete: (req: Request, res: ResponseToolkit) => {
-      // db.destroy();
-      return 'delete request!';
+    delete: async (req: Request, res: ResponseToolkit) => {
+      const { _id } = req.query;
+      if (!_id) {
+        console.log(_id);
+        return { message: 'Query parameter _id is required in order to remove a car' };
+      }
+      const deletion = await db.destroy(req);
+      if (!deletion) {
+        return { message: 'Could not delete car with _id: ' + _id }
+      }
+      return { message: 'Succesfull deletion for car with _id: ' + _id };
     }
   };
 };
