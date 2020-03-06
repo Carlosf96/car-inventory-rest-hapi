@@ -8,9 +8,9 @@ interface IDbService {
   find: (query: RequestQuery) => Promise<unknown>,
 }
 
-const createDbMethod = (method: string) => {
-
-}
+// const createDbMethod = (method: string) => {
+// TODO: Create a db method abstraction
+// }
 
 const DbService = (db: any): IDbService => {
   const promisify = (fn: any) => {
