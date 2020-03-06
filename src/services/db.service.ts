@@ -1,19 +1,23 @@
-import { Car, car } from "../db/entities/Car";
+import { Car } from "../db/entities/Car";
+import { RequestQuery } from "@hapi/hapi";
 
 interface IDbService {
   save: (data: any) => Promise<any>,
-  update: () => Promise<Car>,
-  destroy: () => Promise<Car>,
-  find: (query: any) => Promise<unknown>,
+  update: (query: RequestQuery, payload: Car) => Promise<unknown>,
+  destroy: (query: RequestQuery) => Promise<unknown>,
+  find: (query: RequestQuery) => Promise<unknown>,
 }
 
-const promisify = (fn: any) => {
-  return new Promise((resolve, reject) => {
-    fn(resolve, reject)
-  });
+const createDbMethod = (method: string) => {
+
 }
 
 const DbService = (db: any): IDbService => {
+  const promisify = (fn: any) => {
+    return new Promise((resolve, reject) => {
+      fn(resolve, reject)
+    });
+  }
   return {
     save: async (payload: Car): Promise<any> => {
       const creation = (payload: Car) => (resolve: any, reject: any) => db.insert(payload, (err: any, carsFound: Car[]) => {
@@ -22,23 +26,26 @@ const DbService = (db: any): IDbService => {
       });
       return promisify(creation(payload));
     },
-    update: async (): Promise<any> => {
-      return;
+    update: async ({ query, payload }: RequestQuery & any): Promise<unknown> => {
+      const update = (payload: Car) => (resolve: any, reject: any) => db.update(query, payload, (err: any, res: Car) => {
+        if (err) reject(err);
+        resolve(res)
+      })
+      return promisify(update(payload));
     },
-    destroy: async (): Promise<any> => {
-      return;
-    },
-    find: async ({ query }: any): Promise<unknown> => {
-      let year = 0;
-      if (query?.year !== undefined) {
-        year = Number(query.year);
-        delete query.year;
-      }
-      const search = (year: number, query: any) => (resolve: any, reject: any) => db.find({ year, ...query }, (err: any, carsFound: Car[]) => {
+    destroy: async ({ query }: RequestQuery): Promise<unknown> => {
+      const deletion = (query: any) => (resolve: any, reject: any) => db.remove(query, (err: any, carsFound: Car[]) => {
         if (err) reject(err);
         resolve(carsFound);
       });
-      return promisify(search(year, query));
+      return promisify(deletion(query));
+    },
+    find: async ({ query }: RequestQuery): Promise<unknown> => {
+      const search = (query: any) => (resolve: any, reject: any) => db.find(query, (err: any, carsFound: Car[]) => {
+        if (err) reject(err);
+        resolve(carsFound);
+      });
+      return promisify(search(query));
     },
   };
 }
