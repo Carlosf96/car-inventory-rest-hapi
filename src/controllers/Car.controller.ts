@@ -1,5 +1,5 @@
 import { Request, ResponseToolkit, RequestQuery } from '@hapi/hapi';
-import { Car } from '../db/Car';
+import { Car } from '../db/entities/Car';
 
 export default (db?: any) => {
   return {

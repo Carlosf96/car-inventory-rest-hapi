@@ -1,12 +1,14 @@
 import { Server } from '@hapi/hapi';
-import CarRoute from './routers/Car.route';
+
+import Routes from './routers/Routes';
+
 const init = async (): Promise<void> => {
   const server: Server = new Server({
     port: 8000,
     host: 'localhost',
   });
 
-  server.route(CarRoute);
+  server.route(Routes.carRouter);
 
   await server.start();
 

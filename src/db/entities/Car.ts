@@ -5,3 +5,9 @@ export type Car = {
   year: number,
   _id?: string,
 }
+export const car = (): Car => ({
+  make: '',
+  model: '',
+  vin: '',
+  year: 0,
+})
