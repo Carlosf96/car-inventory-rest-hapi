@@ -1,8 +1,9 @@
-import { Car } from "../db/entities/Car";
 import { RequestQuery } from "@hapi/hapi";
 
+import { Car } from "../db/entities/Car";
+
 interface IDbService {
-  save: (data: any) => Promise<any>,
+  save: (payload: Car) => Promise<unknown>,
   update: (query: RequestQuery, payload: Car) => Promise<unknown>,
   destroy: (query: RequestQuery) => Promise<unknown>,
   find: (query: RequestQuery) => Promise<unknown>,
